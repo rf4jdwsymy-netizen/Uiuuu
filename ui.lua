@@ -1195,61 +1195,75 @@ function OrionLib:MakeWindow(WindowConfig)
                 return ParagraphFunction
             end
 
-            function ElementFunction:AddButton(ButtonConfig)
-                ButtonConfig = ButtonConfig or {}
-                ButtonConfig.Name = ButtonConfig.Name or "Button"
-                ButtonConfig.Callback = ButtonConfig.Callback or function() end
-                ButtonConfig.Icon = ButtonConfig.Icon or "rbxassetid://3944703587"
+            -- ボタンのコード（AddButton関数全体）
+function ElementFunction:AddButton(ButtonConfig)
+    ButtonConfig = ButtonConfig or {}
+    ButtonConfig.Name = ButtonConfig.Name or "Button"
+    ButtonConfig.Callback = ButtonConfig.Callback or function() end
+    ButtonConfig.Icon = ButtonConfig.Icon or "rbxassetid://3944703587"
 
-                local Button = {}
+    local Button = {}
 
-                local Click = SetProps(MakeElement("Button"), {
-                    Size = UDim2.new(1, 0, 1, 0)
-                })
+    local Click = SetProps(MakeElement("Button"), {
+        Size = UDim2.new(1, 0, 1, 0)
+    })
 
-                local ButtonFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 5), {
-                    Size = UDim2.new(1, 0, 0, 33),
-                    Parent = ItemParent
-                }), {
-                    AddThemeObject(SetProps(MakeElement("Label", ButtonConfig.Name, 15), {
-                        Size = UDim2.new(1, -12, 1, 0),
-                        Position = UDim2.new(0, 12, 0, 0),
-                        Font = Enum.Font.Arcade,
-                        Name = "Content"
-                    }), "Text"),
-                    AddThemeObject(SetProps(MakeElement("Image", ButtonConfig.Icon), {
-                        Size = UDim2.new(0, 20, 0, 20),
-                        Position = UDim2.new(1, -30, 0, 7),
-                    }), "TextDark"),
-                    AddThemeObject(MakeElement("Stroke"), "Stroke"),
-                    Click
-                }), "Second")
+    local ButtonFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 5), {
+        Size = UDim2.new(1, 0, 0, 33),
+        Parent = ItemParent,
+        BackgroundTransparency = 0.7  -- 透明ガラスに
+    }), {
+        AddThemeObject(SetProps(MakeElement("Label", ButtonConfig.Name, 15), {
+            Size = UDim2.new(1, -12, 1, 0),
+            Position = UDim2.new(0, 12, 0, 0),
+            Font = Enum.Font.Arcade,
+            Name = "Content"
+        }), "Text"),
+        AddThemeObject(SetProps(MakeElement("Image", ButtonConfig.Icon), {
+            Size = UDim2.new(0, 20, 0, 20),
+            Position = UDim2.new(1, -30, 0, 7),
+        }), "TextDark"),
+        AddThemeObject(MakeElement("Stroke"), "Stroke"),
+        Click
+    }), "Second")
 
-                AddConnection(Click.MouseEnter, function()
-                    TweenService:Create(ButtonFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 3, OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 3, OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 3)}):Play()
-                end)
+    -- ホバー時
+    AddConnection(Click.MouseEnter, function()
+        TweenService:Create(ButtonFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            BackgroundTransparency = 0.5  -- 少し明るく
+        }):Play()
+    end)
 
-                AddConnection(Click.MouseLeave, function()
-                    TweenService:Create(ButtonFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = OrionLib.Themes[OrionLib.SelectedTheme].Second}):Play()
-                end)
+    -- ホバー解除
+    AddConnection(Click.MouseLeave, function()
+        TweenService:Create(ButtonFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            BackgroundTransparency = 0.7  -- 戻す
+        }):Play()
+    end)
 
-                AddConnection(Click.MouseButton1Up, function()
-                    TweenService:Create(ButtonFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 3, OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 3, OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 3)}):Play()
-                    spawn(function()
-                        ButtonConfig.Callback()
-                    end)
-                end)
+    -- クリック時
+    AddConnection(Click.MouseButton1Up, function()
+        TweenService:Create(ButtonFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            BackgroundTransparency = 0.5
+        }):Play()
+        spawn(function()
+            ButtonConfig.Callback()
+        end)
+    end)
 
-                AddConnection(Click.MouseButton1Down, function()
-                    TweenService:Create(ButtonFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(OrionLib.Themes[OrionLib.SelectedTheme].Second.R * 255 + 6, OrionLib.Themes[OrionLib.SelectedTheme].Second.G * 255 + 6, OrionLib.Themes[OrionLib.SelectedTheme].Second.B * 255 + 6)}):Play()
-                end)
+    -- 押し込み時
+    AddConnection(Click.MouseButton1Down, function()
+        TweenService:Create(ButtonFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            BackgroundTransparency = 0.4  -- もっと暗く
+        }):Play()
+    end)
 
-                function Button:Set(ButtonText)
-                    ButtonFrame.Content.Text = ButtonText
-                end    
+    function Button:Set(ButtonText)
+        ButtonFrame.Content.Text = ButtonText
+    end    
 
-                return Button
-            end
+    return Button
+end
 
             function ElementFunction:AddToggle(ToggleConfig)
                 ToggleConfig = ToggleConfig or {}
